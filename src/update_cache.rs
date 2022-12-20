@@ -1,4 +1,4 @@
-use crate::types::{Cache, Violation, Pilot, SerialNumber};
+use crate::types::{Cache, Pilot, SerialNumber, Violation};
 use serde::Deserialize;
 use std::time::Duration;
 
@@ -85,7 +85,11 @@ pub async fn handle_violations(
             let pilot: Pilot = serde_json::from_str(&body)?;
             let distance = drone.distance_to_nest();
             let id = drone.serial_number.clone();
-            let violation = Violation { pilot, distance, id };
+            let violation = Violation {
+                pilot,
+                distance,
+                id,
+            };
 
             let mut cache_lock = cache.write().await;
             cache_lock.insert(drone.serial_number, violation, TTL);
