@@ -1,0 +1,7 @@
+ndz_center_x: 250000.0
+ndz_center_y: 250000.0
+ndz_radius: 100000.0
+server_url: "https://assignments.reaktor.com/birdnest"
+violation_ttl_secs: 600
+update_interval_secs: 2
+

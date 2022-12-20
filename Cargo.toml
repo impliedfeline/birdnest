@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.66"
 axum = "0.6.1"
+config = "0.13.3"
 fake = { version = "2.5.0", features = ["derive"] }
 futures-util = "0.3.25"
 quick-xml = { version = "0.26.0", features = ["serialize"] }
