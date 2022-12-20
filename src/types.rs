@@ -11,7 +11,8 @@ use tokio::sync::RwLock;
 use ttl_cache::TtlCache;
 
 #[derive(Dummy, Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Information {
+pub struct Violation {
+    pub id: SerialNumber,
     pub pilot: Pilot,
     #[dummy(faker = "0.0")]
     pub distance: f64,
@@ -31,4 +32,4 @@ pub struct Pilot {
 }
 
 pub type SerialNumber = String;
-pub type Cache = Arc<RwLock<TtlCache<SerialNumber, Information>>>;
+pub type Cache = Arc<RwLock<TtlCache<SerialNumber, Violation>>>;

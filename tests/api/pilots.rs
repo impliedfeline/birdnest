@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::{iter::zip, time::Duration};
 
-use birdnest::types::{Information, SerialNumber};
+use birdnest::types::{SerialNumber, Violation};
 
 use crate::helpers::spawn_app;
 
@@ -8,10 +8,11 @@ use crate::helpers::spawn_app;
 async fn pilots_responds_with_cache() {
     // Arrange
     let app = spawn_app().await;
-    let cache_contents: Vec<(SerialNumber, Information)> =
-        fake::vec![(SerialNumber, Information); 3];
+    let serial_numbers: Vec<SerialNumber> = fake::vec![SerialNumber; 3];
+    let violations: Vec<Violation> = fake::vec![Violation; 3];
+
     let mut cache_lock = app.cache.write().await;
-    for (key, value) in cache_contents.clone() {
+    for (key, value) in zip(serial_numbers, violations.clone()) {
         cache_lock.insert(key, value, Duration::from_secs(30));
     }
     drop(cache_lock);
@@ -28,8 +29,8 @@ async fn pilots_responds_with_cache() {
     assert!(response.status().is_success());
 
     let payload = response
-        .json::<Vec<(SerialNumber, Information)>>()
+        .json::<Vec<Violation>>()
         .await
         .expect("Failed to parse request as JSON");
-    assert_eq!(cache_contents, payload);
+    assert_eq!(violations, payload);
 }

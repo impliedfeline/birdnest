@@ -1,4 +1,4 @@
-use crate::types::{Cache, Information, Pilot, SerialNumber};
+use crate::types::{Cache, Violation, Pilot, SerialNumber};
 use serde::Deserialize;
 use std::time::Duration;
 
@@ -56,24 +56,24 @@ pub async fn update_cache(cache: Cache) -> anyhow::Result<()> {
         futures_util::future::try_join_all(
             drones
                 .into_iter()
-                .map(|drone| handle_pilot_information(drone, cache.clone())),
+                .map(|drone| handle_violations(drone, cache.clone())),
         )
         .await?;
     }
 }
 
-pub async fn handle_pilot_information(
+pub async fn handle_violations(
     drone: Drone,
     cache: Cache,
 ) -> anyhow::Result<()> {
     let mut cache_lock = cache.write().await;
     // If drone has previously violated NDZ (i.e., is already cached), update TTL and distance if necessary
-    if let Some(information) = cache_lock.remove(&drone.serial_number) {
-        let information = Information {
-            distance: f64::min(drone.distance_to_nest(), information.distance),
-            ..information
+    if let Some(violation) = cache_lock.remove(&drone.serial_number) {
+        let violation = Violation {
+            distance: f64::min(drone.distance_to_nest(), violation.distance),
+            ..violation
         };
-        cache_lock.insert(drone.serial_number, information, TTL);
+        cache_lock.insert(drone.serial_number, violation, TTL);
     // If drone has not previously violated NDZ but is currently in violation of NDZ
     } else if drone.is_in_no_drone_zone() {
         drop(cache_lock);
@@ -84,10 +84,11 @@ pub async fn handle_pilot_information(
 
             let pilot: Pilot = serde_json::from_str(&body)?;
             let distance = drone.distance_to_nest();
-            let information = Information { pilot, distance };
+            let id = drone.serial_number.clone();
+            let violation = Violation { pilot, distance, id };
 
             let mut cache_lock = cache.write().await;
-            cache_lock.insert(drone.serial_number, information, TTL);
+            cache_lock.insert(drone.serial_number, violation, TTL);
         }
     }
     Ok(())
