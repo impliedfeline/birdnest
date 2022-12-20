@@ -16,12 +16,9 @@ async fn pilots_responds_with_cache() {
         cache_lock.insert(key, value, Duration::from_secs(30));
     }
     drop(cache_lock);
-    let client = reqwest::Client::new();
 
     // Act
-    let response = client
-        .get(format!("http://{}/pilots", app.address))
-        .send()
+    let response = reqwest::get(format!("http://{}/pilots", app.address))
         .await
         .expect("Failed to execute request.");
 
