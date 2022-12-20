@@ -18,6 +18,7 @@ pub struct Information {
 }
 
 #[derive(Dummy, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct Pilot {
     #[dummy(faker = "FirstName()")]
     pub first_name: String,
