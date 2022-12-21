@@ -38,7 +38,7 @@ impl Drone {
     }
 }
 
-pub async fn update_cache(
+pub async fn run_worker(
     cache: Cache,
     config: &CacheConfig,
 ) -> anyhow::Result<()> {

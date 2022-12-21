@@ -1,6 +1,8 @@
 use std::{net::TcpListener, sync::Arc};
 
-use birdnest::{config::CacheConfig, startup::run, update_cache::update_cache};
+use birdnest::{
+    cache_update_worker::run_worker, config::CacheConfig, startup::run,
+};
 use futures_util::try_join;
 use tokio::sync::RwLock;
 use ttl_cache::TtlCache;
@@ -14,7 +16,7 @@ async fn main() -> anyhow::Result<()> {
 
     try_join!(
         run(listener, cache.clone()),
-        update_cache(cache.clone(), &config)
+        run_worker(cache.clone(), &config)
     )?;
 
     Ok(())
