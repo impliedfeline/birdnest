@@ -1,7 +1,10 @@
 use std::net::TcpListener;
 
 use axum::{routing::get, Extension, Router};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::{
+    compression::CompressionLayer,
+    cors::{Any, CorsLayer},
+};
 
 use crate::{
     routes::{health_check, pilots},
@@ -14,7 +17,8 @@ pub async fn run(listener: TcpListener, cache: Cache) -> anyhow::Result<()> {
         .route("/health_check", get(health_check))
         .route("/pilots", get(pilots))
         .layer(Extension(cache))
-        .layer(cors);
+        .layer(cors)
+        .layer(CompressionLayer::new());
 
     axum::Server::from_tcp(listener)
         .unwrap()
