@@ -1,9 +1,16 @@
 use std::net::TcpListener;
 
-use axum::{routing::get, Extension, Router};
+use axum::{
+    body::{boxed, Body},
+    http::{Response, StatusCode},
+    routing::get,
+    Extension, Router,
+};
+use tower::ServiceExt;
 use tower_http::{
     compression::CompressionLayer,
     cors::{Any, CorsLayer},
+    services::ServeDir,
 };
 
 use crate::{
@@ -16,6 +23,15 @@ pub async fn run(listener: TcpListener, cache: Cache) -> anyhow::Result<()> {
     let app = Router::new()
         .route("/health_check", get(health_check))
         .route("/pilots", get(pilots))
+        .fallback_service(get(|req| async move {
+            match ServeDir::new("frontend/build").oneshot(req).await {
+                Ok(res) => res.map(boxed),
+                Err(err) => Response::builder()
+                    .status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .body(boxed(Body::from(format!("error: {err}"))))
+                    .expect("error response"),
+            }
+        }))
         .layer(Extension(cache))
         .layer(cors)
         .layer(CompressionLayer::new());
