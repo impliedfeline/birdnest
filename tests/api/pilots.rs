@@ -18,7 +18,7 @@ async fn pilots_responds_with_cache() {
     drop(cache_lock);
 
     // Act
-    let response = reqwest::get(format!("http://{}/pilots", app.address))
+    let response = reqwest::get(format!("http://{}/api/pilots", app.address))
         .await
         .expect("Failed to execute request.");
 
