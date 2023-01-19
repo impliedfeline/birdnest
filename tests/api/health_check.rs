@@ -6,9 +6,10 @@ async fn health_check_works() {
     let app = spawn_app().await;
 
     // Act
-    let response = reqwest::get(format!("http://{}/api/health_check", app.address))
-        .await
-        .expect("Failed to execute request.");
+    let response =
+        reqwest::get(format!("http://{}/api/health_check", app.address))
+            .await
+            .expect("Failed to execute request.");
 
     // Assert
     assert!(response.status().is_success());
