@@ -21,8 +21,8 @@ use crate::{
 pub async fn run(listener: TcpListener, cache: Cache) -> anyhow::Result<()> {
     let cors = CorsLayer::new().allow_origin(Any);
     let app = Router::new()
-        .route("/health_check", get(health_check))
-        .route("/pilots", get(pilots))
+        .route("/api/health_check", get(health_check))
+        .route("/api/pilots", get(pilots))
         .fallback_service(get(|req| async move {
             match ServeDir::new("frontend/build").oneshot(req).await {
                 Ok(res) => res.map(boxed),

@@ -2,7 +2,7 @@
 	import PilotTable from './PilotTable.svelte';
 
 	async function getPilots() {
-		const response = await fetch('http://127.0.0.1:3000/pilots');
+		const response = await fetch('/api/pilots');
 		const pilots = await response.json();
 
 		if (response.ok) {
