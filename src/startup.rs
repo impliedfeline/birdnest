@@ -24,7 +24,7 @@ pub async fn run(listener: TcpListener, cache: Cache) -> anyhow::Result<()> {
         .route("/api/health_check", get(health_check))
         .route("/api/pilots", get(pilots))
         .fallback_service(get(|req| async move {
-            match ServeDir::new("frontend/build").oneshot(req).await {
+            match ServeDir::new("dist").oneshot(req).await {
                 Ok(res) => res.map(boxed),
                 Err(err) => Response::builder()
                     .status(StatusCode::INTERNAL_SERVER_ERROR)
